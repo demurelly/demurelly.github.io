@@ -14,19 +14,19 @@
     <title>Java线程状态 :: Demurely</title>
     
     
-    <link href="/css/nucleus.css?1531837405" rel="stylesheet">
-    <link href="/css/font-awesome.min.css?1531837405" rel="stylesheet">
-    <link href="/css/hybrid.css?1531837405" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1531837405" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1531837405" rel="stylesheet">
-    <link href="/css/auto-complete.css?1531837405" rel="stylesheet">
-    <link href="/css/theme.css?1531837405" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1531837405" rel="stylesheet">
+    <link href="/css/nucleus.css?1531844503" rel="stylesheet">
+    <link href="/css/font-awesome.min.css?1531844503" rel="stylesheet">
+    <link href="/css/hybrid.css?1531844503" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1531844503" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1531844503" rel="stylesheet">
+    <link href="/css/auto-complete.css?1531844503" rel="stylesheet">
+    <link href="/css/theme.css?1531844503" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1531844503" rel="stylesheet">
     
-      <link href="/css/theme-green.css?1531837405" rel="stylesheet">
+      <link href="/css/theme-green.css?1531844503" rel="stylesheet">
     
 
-    <script src="/js/jquery-2.x.min.js?1531837405"></script>
+    <script src="/js/jquery-2.x.min.js?1531844503"></script>
     
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{ 
@@ -71,14 +71,14 @@
     <span data-search-clear=""><i class="fa fa-close"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1531837405"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1531837405"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1531844503"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1531844503"></script>
 <script type="text/javascript">
     
         var baseurl = '\/';
     
 </script>
-<script type="text/javascript" src="/js/search.js?1531837405"></script>
+<script type="text/javascript" src="/js/search.js?1531844503"></script>
 
     
   </div>
@@ -216,8 +216,54 @@
         
 
 
-<p>Java线程状态定义在Thread类中.
-    <strong>NEW、RUNNABLE、BLOCKED、WAITING、TIMED_WAITING、TERMINATED</strong></p>
+<p>Java线程状态定义在<code>java.lang.Thread.State</code>类中:</p>
+
+<pre><code>public enum State {
+    NEW,
+    RUNNABLE,
+    BLOCKED,
+    WAITING,
+    TIMED_WAITING,
+    TERMINATED;
+}
+</code></pre>
+
+<ul>
+<li><strong>NEW</strong> 线程实例化完成之后<code>start()</code>之前处于该状态.</li>
+<li><strong>RUNNABLE</strong>  该状态包含两个状态：<strong>等待调度（Ready）</strong>、<strong>正在执行（Running）</strong>。<code>start()</code>之后处于<font color='orange' size=3 ><strong>Ready</strong></font>状态，当获得CPU时转换为<font color='blue' size=3><strong>Running</strong></font>状态。而<font color='blue' size=3><strong>Running</strong></font>使用<code>yield()</code>释放CPU时转为<font color='orange' size=3><strong>Ready</strong></font>状态。</li>
+<li><strong>TERMINATED</strong> 线程执行完成</li>
+<li><strong>TIMED_WAITING</strong> 调用以下方法进入该状态
+<code>
+Thread.sleep(long)、Object.wait(long)、join(long)、LockSupport.parkNanos、 LockSupport.parkUntil
+</code><br />
+当到达指定的时间只有，转换为<font color='red' size=3><strong>RUNNABLE</strong></font>状态.</li>
+<li><strong>WAITING</strong> 当调用<code>Object.wait()</code>、<code>join()</code>和<code>LockSupport.park()</code>进入该状态。通过<code>Object.wait()</code>进入<font color='red' size=3><strong>WAITING</strong></font>状态（只有在拥有锁时才可进入该状态），只有调用<code>Object.notify()</code>或者<code>Object.notifyAll()</code>时才能退出该状态；通过<code>join()</code>进入<font color='red' size=3><strong>WAITING</strong></font>，则只有等待<strong>调用线程</strong>执行完成才会退出。退出该状态都转换到<font color='red' size=3><strong>RUNNABLE</strong></font>。</li>
+<li><strong>BLOCKED</strong> 当线程访问资源或代码块时，如果锁被其他线程占用，则进入该状态。当线程获取到锁时，进入<font color='red' size=3><strong>RUNNABLE</strong></font>状态。</li>
+</ul>
+
+<p><strong>一个实例：</strong>
+面试过程中这样一个问题，描述如下：</p>
+
+<pre><code>public static void main(String [] args) throws Exception, InterruptedException {
+   new Thread(()-&gt;System.out.println(&quot;child..&quot;),&quot;child-thread&quot;).start();
+   System.out.println(&quot;main..&quot;);
+}
+输出如下：
+main...
+child..
+</code></pre>
+
+<p>该代码为何会先输出main再输出child ？用线程状态解释再清晰不过，当主线程启动子线程时，主线程处于<font color='red' size=3><strong>RUNNABLE</strong></font>中的<font color='blue' size=3><strong>Running</strong></font>状态，而子线程则处于<font color='orange' size=3 ><strong>Ready</strong></font>状态，所以主线程先执行。如果主线程需要处理更多消耗时间的事情或者直接调用<code>sleep()</code>让主线程处于<font size=3 color='green'><strong>TIMED_WAITING</strong></font>状态，那么子线程就会先执行。</p>
+
+<pre><code>public static void main(String [] args) throws Exception, InterruptedException {
+   new Thread(()-&gt;System.out.println(&quot;child..&quot;),&quot;child-thread&quot;).start();
+   Thread.sleep(1l);
+   System.out.println(&quot;main..&quot;);
+}
+输出如下：
+child..
+main..
+</code></pre>
 
 
 <footer class=" footline" >
@@ -302,20 +348,20 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1531837405"></script>
-    <script src="/js/perfect-scrollbar.min.js?1531837405"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1531837405"></script>
-    <script src="/js/jquery.sticky.js?1531837405"></script>
-    <script src="/js/featherlight.min.js?1531837405"></script>
-    <script src="/js/html5shiv-printshiv.min.js?1531837405"></script>
-    <script src="/js/highlight.pack.js?1531837405"></script>
+    <script src="/js/clipboard.min.js?1531844503"></script>
+    <script src="/js/perfect-scrollbar.min.js?1531844503"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1531844503"></script>
+    <script src="/js/jquery.sticky.js?1531844503"></script>
+    <script src="/js/featherlight.min.js?1531844503"></script>
+    <script src="/js/html5shiv-printshiv.min.js?1531844503"></script>
+    <script src="/js/highlight.pack.js?1531844503"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom.71422.js?1531837405"></script>
-    <script src="/js/learn.js?1531837405"></script>
-    <script src="/js/hugo-learn.js?1531837405"></script>
+    <script src="/js/modernizr.custom.71422.js?1531844503"></script>
+    <script src="/js/learn.js?1531844503"></script>
+    <script src="/js/hugo-learn.js?1531844503"></script>
 
-    <link href="/mermaid/mermaid.css?1531837405" type="text/css" rel="stylesheet" />
-    <script src="/mermaid/mermaid.js?1531837405"></script>
+    <link href="/mermaid/mermaid.css?1531844503" type="text/css" rel="stylesheet" />
+    <script src="/mermaid/mermaid.js?1531844503"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>

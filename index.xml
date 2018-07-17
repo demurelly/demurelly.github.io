@@ -17,7 +17,11 @@
       <pubDate>Mon, 11 Jun 2018 23:17:39 +0800</pubDate>
       
       <guid>http://hruixyz.github.io/post/first/</guid>
-      <description>Java线程状态定义在Thread类中. NEW、RUNNABLE、BLOCKED、WAITING、TIMED_WAITING、TERMINATED</description>
+      <description>Java线程状态定义在java.lang.Thread.State类中:
+public enum State { NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED; }   NEW 线程实例化完成之后start()之前处于该状态. RUNNABLE 该状态包含两个状态：等待调度（Ready）、正在执行（Running）。start()之后处于Ready状态，当获得CPU时转换为Running状态。而Running使用yield()释放CPU时转为Ready状态。 TERMINATED 线程执行完成 TIMED_WAITING 调用以下方法进入该状态  Thread.sleep(long)、Object.wait(long)、join(long)、LockSupport.parkNanos、 LockSupport.parkUntil 
+当到达指定的时间只有，转换为RUNNABLE状态. WAITING 当调用Object.wait()、join()和LockSupport.park()进入该状态。通过Object.wait()进入WAITING状态（只有在拥有锁时才可进入该状态），只有调用Object.notify()或者Object.notifyAll()时才能退出该状态；通过join()进入WAITING，则只有等待调用线程执行完成才会退出。退出该状态都转换到RUNNABLE。 BLOCKED 当线程访问资源或代码块时，如果锁被其他线程占用，则进入该状态。当线程获取到锁时，进入RUNNABLE状态。  一个实例： 面试过程中这样一个问题，描述如下：
+public static void main(String [] args) throws Exception, InterruptedException { new Thread(()-&amp;gt;System.out.println(&amp;quot;child..&amp;quot;),&amp;quot;child-thread&amp;quot;).start(); System.out.println(&amp;quot;main..&amp;quot;); } 输出如下： main... child..  该代码为何会先输出main再输出child ？用线程状态解释再清晰不过，当主线程启动子线程时，主线程处于RUNNABLE中的Running状态，而子线程则处于Ready状态，所以主线程先执行。如果主线程需要处理更多消耗时间的事情或者直接调用sleep()让主线程处于TIMED_WAITING状态，那么子线程就会先执行。
+public static void main(String [] args) throws Exception, InterruptedException { new Thread(()-&amp;gt;System.out.println(&amp;quot;child..&amp;quot;),&amp;quot;child-thread&amp;quot;).start(); Thread.sleep(1l); System.out.println(&amp;quot;main..&amp;quot;); } 输出如下： child.</description>
     </item>
     
   </channel>
