@@ -24,5 +24,15 @@ public static void main(String [] args) throws Exception, InterruptedException {
 public static void main(String [] args) throws Exception, InterruptedException { new Thread(()-&amp;gt;System.out.println(&amp;quot;child..&amp;quot;),&amp;quot;child-thread&amp;quot;).start(); Thread.sleep(1l); System.out.println(&amp;quot;main..&amp;quot;); } 输出如下： child.</description>
     </item>
     
+    <item>
+      <title>Pass-By-Value</title>
+      <link>http://hruixyz.github.io/post/pass-by-value/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://hruixyz.github.io/post/pass-by-value/</guid>
+      <description>传递方式 Java中参数传递都是值传递，参见下面代码。
+public class PassByRerOrVal { private String name; public PassByRerOrVal(String n){this.name = n;} public String getName() { return name; } public void setName(String name) { this.name = name; } public static void main(String args[]){ PassByRerOrVal init = new PassByRerOrVal(&amp;quot;init&amp;quot;); change(init); System.out.println(&amp;quot;changed : &amp;quot; + init.getName()); // changed : init modify(init); System.out.println(&amp;quot;modify : &amp;quot; + init.getName()); // modify : modify ref } private static void change(PassByRerOrVal change){ PassByRerOrVal t = new PassByRerOrVal(&amp;quot;change ref&amp;quot;); change = t; } private static void modify(PassByRerOrVal p){ p.</description>
+    </item>
+    
   </channel>
 </rss>

@@ -11,22 +11,22 @@
 <link rel="icon" href="/images/favicon.png" type="image/x-icon" />
 
 
-    <title>Tags :: Demurely</title>
+    <title>Pass-By-Value :: Demurely</title>
     
     
-    <link href="/css/nucleus.css?1531925016" rel="stylesheet">
-    <link href="/css/font-awesome.min.css?1531925016" rel="stylesheet">
-    <link href="/css/hybrid.css?1531925016" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1531925016" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1531925016" rel="stylesheet">
-    <link href="/css/auto-complete.css?1531925016" rel="stylesheet">
-    <link href="/css/theme.css?1531925016" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1531925016" rel="stylesheet">
+    <link href="/css/nucleus.css?1531925015" rel="stylesheet">
+    <link href="/css/font-awesome.min.css?1531925015" rel="stylesheet">
+    <link href="/css/hybrid.css?1531925015" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1531925015" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1531925015" rel="stylesheet">
+    <link href="/css/auto-complete.css?1531925015" rel="stylesheet">
+    <link href="/css/theme.css?1531925015" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1531925015" rel="stylesheet">
     
-      <link href="/css/theme-green.css?1531925016" rel="stylesheet">
+      <link href="/css/theme-green.css?1531925015" rel="stylesheet">
     
 
-    <script src="/js/jquery-2.x.min.js?1531925016"></script>
+    <script src="/js/jquery-2.x.min.js?1531925015"></script>
     
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{ 
@@ -36,7 +36,7 @@
     </style>
     
   </head>
-  <body class="" data-url="/tags/">
+  <body class="" data-url="/post/pass-by-value/">
     <nav id="sidebar" class="">
 
 
@@ -71,14 +71,14 @@
     <span data-search-clear=""><i class="fa fa-close"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1531925016"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1531925016"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1531925015"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1531925015"></script>
 <script type="text/javascript">
     
         var baseurl = '\/';
     
 </script>
-<script type="text/javascript" src="/js/search.js?1531925016"></script>
+<script type="text/javascript" src="/js/search.js?1531925015"></script>
 
     
   </div>
@@ -95,8 +95,8 @@
   
     
     <li data-nav-id="/post/" title="Posts" class="dd-item 
+        parent
         
-        active
         
         ">
       <a href="/post/">
@@ -138,7 +138,7 @@
  
   
     
-      <li data-nav-id="/post/pass-by-value/" title="Pass-By-Value" class="dd-item ">
+      <li data-nav-id="/post/pass-by-value/" title="Pass-By-Value" class="dd-item active">
         <a href="/post/pass-by-value/">
         Pass-By-Value
         
@@ -197,7 +197,19 @@
                     
           
           
-            Tags
+            
+            
+          
+          
+            
+            
+          
+          
+            <a href='/'>Demurely</a> > <a href='/post/'>Posts</a> > Pass-By-Value
+          
+         
+          
+         
           
            
                   </span>
@@ -205,7 +217,16 @@
                 
                     <div class="progress">
     <div class="wrapper">
-
+<nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#传递方式">传递方式</a></li>
+<li><a href="#传递流程">传递流程</a></li>
+<li><a href="#final修饰参数">final修饰参数</a></li>
+</ul></li>
+</ul>
+</nav>
     </div>
 </div>
 
@@ -217,7 +238,7 @@
         
         <div id="body-inner">
           
-            <h1>Tags</h1>
+            <h1>Pass-By-Value</h1>
           
 
         
@@ -225,9 +246,86 @@
 
 
 
+<h2 id="传递方式">传递方式</h2>
+
+<p>Java中参数传递都是值传递，参见下面代码。</p>
+
+<pre><code class="language-java">public class PassByRerOrVal {
+    private String name;
+    public PassByRerOrVal(String n){this.name = n;}
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public static void main(String args[]){
+        PassByRerOrVal init = new PassByRerOrVal(&quot;init&quot;);
+        change(init);
+        System.out.println(&quot;changed : &quot; + init.getName());  // changed : init
+        modify(init);
+        System.out.println(&quot;modify : &quot; + init.getName());   // modify : modify ref
+    }
+    private static void change(PassByRerOrVal change){
+        PassByRerOrVal t = new PassByRerOrVal(&quot;change ref&quot;);
+        change = t;
+    }
+    private static void modify(PassByRerOrVal p){
+        p.setName(&quot;modify ref&quot;);
+    }
+
+}
+</code></pre>
+
+<h2 id="传递流程">传递流程</h2>
+
+<ul>
+<li>定义<code>init</code>为<code>PassByRerOrVal</code>类型并且属性<code>name</code>值为<font size=3 color='red'><strong>init</strong></font> ，<code>change()</code>参数change对应的值为<font size="3" color='green'><strong>null</strong></font><br />
+<img src="/media/img/change.jpg" alt="" /></li>
+<li>当<code>change()</code>被调用时，参数<code>change</code>将会依赖<font size=3 color='red'><strong>init</strong></font>。<br />
+<img src="/media/img/call-change.png" alt="" /></li>
+<li><code>change()</code>中定义t变量并把值赋给change之后，change将不再指向<font size=3 color='red'><strong>init</strong></font>变量地址，而是指向t变量。此时对change做的所有改变都不会影响到<font size=3 color='red'><strong>init</strong></font>变量<br />
+<img src="/media/img/assign-new-2-change.png" alt="" /></li>
+<li>而modify则是直接修改内部属性。</li>
+</ul>
+
+<h2 id="final修饰参数">final修饰参数</h2>
+
+<p>从上面可以知道Java中参数传递都是值传递，做的所有修改不会影响原变量，那为何需要<font size=3 color='orange'>final</font>来修饰参数呢？还是说<font size=3 color='orange'>final</font>修饰的参数，内部属性也不允许修改？</p>
+
+<pre><code class="language-java">public static void main(String args[]){
+    PassByRerOrVal p = new PassByRerOrVal(&quot;init&quot;);
+    finalChange(p);
+    System.out.println(p.getName()); // final...
+}
+private static void finalChange(final PassByRerOrVal fChange){
+    fChange.setName(&quot;final...&quot;);
+}
+</code></pre>
+
+<p>从上面代码可以知道，即使是<font size=3 color='orange'>final</font>修饰的参数，内部属性仍然是可以被修改的。那么<font size=3 color='orange'>final</font>修饰参数的意义又是什么呢？通过查阅资料，了解到<font size=3 color='orange'>final</font>修饰参数是为了保证<strong>内部类中参数的一致性</strong>。</p>
+
+<pre><code class="language-java">public static void main(String args[]){
+    finalChange(&quot;hello&quot;);
+}
+private static void finalChange( String str){
+    AClass ac = new AClass() {
+        @Override
+        void something() {
+            str = &quot;hehe&quot;;
+        }
+    };
+}
+</code></pre>
+
+<p>上面这段代码在JDK8中已经不能编译通过，提示通过内部类访问str变量，该变量必须是<font size=3 color='orange'>final</font>修饰的变量或者实际最终变量，既没有被修改过的。</p>
+
+
 <footer class=" footline" >
 	
 </footer>
+
 
         
         </div> 
@@ -260,8 +358,6 @@
             
                 
                     
-                        
-                        
                     
                 
                 
@@ -276,6 +372,9 @@
             
                 
                     
+                        
+                        
+                    
                 
                 
 
@@ -292,6 +391,7 @@
             
                 
                     
+                    
                 
                 
 
@@ -313,8 +413,10 @@
 
 
         
+            <a class="nav nav-prev" href="/post/first/" title="Java线程状态"> <i class="fa fa-chevron-left"></i></a>
         
-            <a class="nav nav-next" href="/post/" title="Posts" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+        
+            <a class="nav nav-next" href="/post/first/" title="Java线程状态" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
         
     </div>
 
@@ -344,3 +446,4 @@
 
   </body>
 </html>
+
